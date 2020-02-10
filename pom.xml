@@ -12,8 +12,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
   
   <build>
@@ -37,16 +37,9 @@
 
   <dependencies>
 		<dependency>
-			<groupId>x.mvmn.gphoto2</groupId>
-			<artifactId>gphoto2-jna</artifactId>
-			<version>1.0</version>
-			<systemPath>/home/nick/eclipse-workspace/gphoto2-jna/target/gphoto2-jna-1.1.jar</systemPath>
-			<scope>system</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-servlet</artifactId>
-			<version>7.6.15.v20140411</version>
+			<groupId>com.angryelectron</groupId>
+			<artifactId>gphoto-jna</artifactId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.java.dev.jna</groupId>
