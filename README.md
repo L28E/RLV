@@ -1,6 +1,5 @@
 # RLV
-Remove LiveView of a DSLR.
+Remove LiveView of a DSLR camera.
 
 ## Overview
-Uses JNA to access gphoto2 and displays the liveview in a Jetty servlet with controls for the exposure triangle (hopefully).
-For native access to the gphoto2 libraries, the [gphoto2-jna](https://github.com/mvmn/gphoto2-jna) repo is used. 
+Uses a JNAerated library and simple API for native access to libgphoto2, forked from [here](https://github.com/angryelectron/libgphoto2-jna). 
