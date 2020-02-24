@@ -45,22 +45,22 @@ public class app {
 		@Override
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 			final OutputStream out = resp.getOutputStream();
-			byte[] frame;	
-			
+			byte[] frame;
+
 			/*
-			 * The MIME content type "multipart/x-mixed-replace" lets me replace a component
-			 * of the page in subsequent HTTP responses.
+			 * The MIME content type "multipart/x-mixed-replace" is a type of HTTP response
+			 * that lets me replace a component of the page in subsequent messages.
 			 */
 			resp.setContentType("multipart/x-mixed-replace; boundary=--boundary");
 			resp.setStatus(HttpServletResponse.SC_OK);
 
-			// Send HTTP responses with frame data in a while loop.
+			// Send messages with frame data in a while loop.
 			while (true) {
 				try {
 					// Get a frame.
 					frame = camera.capturePreview();
 
-					// Write the HTTP response.
+					// Write the message.
 					out.write(prefix);
 					out.write(String.valueOf(frame.length).getBytes());
 					out.write(separator);
