@@ -16,8 +16,6 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.angryelectron.gphoto2.GPhoto2;
 import com.angryelectron.libgphoto2.Gphoto2Library.CameraFile;
@@ -73,39 +71,41 @@ public class app {
 		@Override
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 			final OutputStream out = resp.getOutputStream();
-			byte[] frame;
 			CameraFile fileRef = camera.createCameraFile();
+			byte[] frame;			
 
-			/*
-			 * The MIME content type "multipart/x-mixed-replace" is a type of HTTP response
-			 * that lets me replace a component of the page in subsequent messages.
-			 */
+			// Multipart response allows frames to be replaced in subsequent messages   
 			resp.setContentType("multipart/x-mixed-replace; boundary=--boundary");
 			resp.setStatus(HttpServletResponse.SC_OK);
 
 			// Send messages with frame data in a while loop.
 			try {
-				while (true) { // TODO: Find a logical exit condition.
-					// Get a frame.
+				while (true) {
 					frame = camera.capturePreview(fileRef);
 
 					// Write the message.
 					out.write(prefix);
 					out.write(String.valueOf(frame.length).getBytes());
 					out.write(separator);
-					out.write(frame);
-					out.write(separator);
-					out.flush();
-					
-					// TODO: This kinda stinks, try un-reffing stuff here and in the api.
+
+					// If the response is interrupted, exit doGet before an error occurs
+					try {
+						out.write(frame);
+						out.write(separator);
+						out.flush();
+					} catch (Exception ex) {
+						break;
+					}					
+
+					// TODO: I dont like this, try de/un-reffing stuff here and in the api.
+					Thread.yield();
 					System.gc();
 				}
 			} catch (IOException ex) {
 				Logger.getLogger(app.class.getName()).log(Level.SEVERE, ex.getMessage());
 				camera.close();
+				ex.printStackTrace();
 				System.exit(-1);
-			} finally {
-				camera.close();
 			}
 		}
 
