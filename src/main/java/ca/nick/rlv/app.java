@@ -22,8 +22,6 @@ import com.angryelectron.libgphoto2.Gphoto2Library.CameraFile;
 
 public class app {
 	private static GPhoto2 camera = new GPhoto2();
-	private static final byte[] prefix = ("--boundary\r\nContent-type: image/jpg\r\nContent-Length: ").getBytes();
-	private static final byte[] separator = "\r\n\r\n".getBytes();
 
 	public static void main(String[] args) throws Exception {
 
@@ -67,14 +65,16 @@ public class app {
 
 	@SuppressWarnings("serial")
 	public static class StreamMJPG extends HttpServlet {
+		private static final byte[] PREFIX = ("--boundary\r\nContent-type: image/jpg\r\nContent-Length: ").getBytes();
+		private static final byte[] SEPARATOR = "\r\n\r\n".getBytes();
 
 		@Override
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 			final OutputStream out = resp.getOutputStream();
 			CameraFile fileRef = camera.createCameraFile();
-			byte[] frame;			
+			byte[] frame;
 
-			// Multipart response allows frames to be replaced in subsequent messages   
+			// Multipart response allows frames to be replaced in subsequent messages
 			resp.setContentType("multipart/x-mixed-replace; boundary=--boundary");
 			resp.setStatus(HttpServletResponse.SC_OK);
 
@@ -84,18 +84,18 @@ public class app {
 					frame = camera.capturePreview(fileRef);
 
 					// Write the message.
-					out.write(prefix);
+					out.write(PREFIX);
 					out.write(String.valueOf(frame.length).getBytes());
-					out.write(separator);
+					out.write(SEPARATOR);
 
 					// If the response is interrupted, exit doGet before an error occurs
 					try {
 						out.write(frame);
-						out.write(separator);
+						out.write(SEPARATOR);
 						out.flush();
 					} catch (Exception ex) {
 						break;
-					}					
+					}
 
 					// TODO: I dont like this, try de/un-reffing stuff here and in the api.
 					Thread.yield();
