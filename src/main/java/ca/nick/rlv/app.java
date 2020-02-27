@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.jetty.io.EofException;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -78,36 +79,29 @@ public class app {
 			resp.setContentType("multipart/x-mixed-replace; boundary=--boundary");
 			resp.setStatus(HttpServletResponse.SC_OK);
 
-			// Send messages with frame data in a while loop.
-			try {
-				while (true) {
+			// Send messages with image data in a while loop.
+			while (true) {
+				try {
 					frame = camera.capturePreview(fileRef);
 
-					// Write the message.
 					out.write(PREFIX);
 					out.write(String.valueOf(frame.length).getBytes());
 					out.write(SEPARATOR);
-
-					// If the response is interrupted, exit doGet before an error occurs
-					try {
-						out.write(frame);
-						out.write(SEPARATOR);
-						out.flush();
-					} catch (Exception ex) {
-						break;
-					}
+					out.write(frame);
+					out.write(SEPARATOR);
+					out.flush();
 
 					// TODO: I dont like this, try de/un-reffing stuff here and in the api.
 					Thread.yield();
 					System.gc();
+				} catch (IOException ex) {
+					/*
+					 * If the response is interrupted, or if the image data cannot be read, 
+					 * exit loop and finish doGet
+					 */
+					break;
 				}
-			} catch (IOException ex) {
-				Logger.getLogger(app.class.getName()).log(Level.SEVERE, ex.getMessage());
-				camera.close();
-				ex.printStackTrace();
-				System.exit(-1);
 			}
 		}
-
 	}
 }
