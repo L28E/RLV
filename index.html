@@ -1,29 +1,79 @@
 <html>
 
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Nick's Remote Viewfinder</title>
 	<style>
 		body {
 			background: rgb(58, 58, 58);
 			color: white;
-			font-family: Arial, Helvetica, sans-serif
+			font-family: Arial, Helvetica, sans-serif;
+			font-style: italic;
+		}
+
+		h1 {
+			text-align: center;
+		}
+
+		img {
+			max-width: 90%;
+			height: auto;
+			margin: 10px auto 20px;
+			display: block;
+		}
+
+		section {
+			display: flex;
+		}
+
+		.param_column {
+			display: inline-block;
+			margin: auto;
 		}
 	</style>
 </head>
 
 <body>
 	<header>
-		<h1 style="text-align: center;">bleh</h1>
-		<img style="margin:10px auto 20px; display: block;" src="./stream.mjpg">
+		<h1>bleh</h1>
+		<img src="./stream.mjpg">
 	</header>
 
 	<section>
-		<select id="iso" onchange="changeISO()">
-			<option value="200">200</option>
-			<option value="400">400</option>
-			<option value="800">800</option>
-			<option value="1600">1600</option>
-		</select>
+
+		<div class="param_column">
+			<p>ISO</p>
+			<select id="iso" onchange="changeISO()">
+				<option value="200">200</option>
+				<option value="400">400</option>
+				<option value="800">800</option>
+				<option value="1600">1600</option>
+			</select>
+		</div>
+
+		<div class="param_column">
+			<p>F-Stop</p>
+			<select id="fstop">
+				<option value="200">200</option>
+				<option value="400">400</option>
+				<option value="800">800</option>
+				<option value="1600">1600</option>
+			</select>
+		</div>
+
+		<div class="param_column">
+			<p>Shutter Speed</p>
+			<select id="shutter">
+				<option value="200">200</option>
+				<option value="400">400</option>
+				<option value="800">800</option>
+				<option value="1600">1600</option>
+			</select>
+		</div>
+
+		<div class="param_column">
+			<button>snap</button>
+		</div>
 	</section>
 
 	<script>
