@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.jetty.io.EofException;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -43,10 +42,11 @@ public class app {
 		resourceHandler.setResourceBase(".");
 		resourceHandler.setWelcomeFiles(new String[] { "index.html" });
 
-		// Image handler
+		// Context handler
 		ServletContextHandler context = new ServletContextHandler();
 		context.setContextPath("/");
 		context.addServlet(StreamMJPG.class, "/stream.mjpg");
+		context.addServlet(cameraControl.class, "/");		
 
 		// Register handlers with the server
 		handlers.setHandlers(new Handler[] { resourceHandler, context, new DefaultHandler() });
@@ -63,6 +63,16 @@ public class app {
 			}
 		});
 	}
+	
+	@SuppressWarnings("serial")
+	public static class cameraControl extends HttpServlet {
+    	
+    	@Override
+    	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    		System.out.println(req.getParameter("iso"));    		
+			resp.setStatus(HttpServletResponse.SC_OK);    		
+    	}
+    }	
 
 	@SuppressWarnings("serial")
 	public static class StreamMJPG extends HttpServlet {

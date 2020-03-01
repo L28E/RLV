@@ -1,8 +1,43 @@
 <html>
+
 <head>
-    <title>Nick's Remote Viewfinder</title>
+	<title>Nick's Remote Viewfinder</title>
+	<style>
+		body {
+			background: rgb(58, 58, 58);
+			color: white;
+			font-family: Arial, Helvetica, sans-serif
+		}
+	</style>
 </head>
+
 <body>
-    <h1 style="text-align: center;">bleh</h1>            
-	<img style="margin:10px auto 20px; display: block;" src="./stream.mjpg">
+	<header>
+		<h1 style="text-align: center;">bleh</h1>
+		<img style="margin:10px auto 20px; display: block;" src="./stream.mjpg">
+	</header>
+
+	<section>
+		<select id="iso" onchange="changeISO()">
+			<option value="200">200</option>
+			<option value="400">400</option>
+			<option value="800">800</option>
+			<option value="1600">1600</option>
+		</select>
+	</section>
+
+	<script>
+		var iso;
+
+		function changeISO() {
+			var temp = document.getElementById("iso").value;
+			if (temp != iso) {
+				iso = temp;
+				const req = new XMLHttpRequest();
+				req.open("POST", ".");
+				req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				req.send("iso=" + iso);
+			}
+		}
+	</script>
 </body>
