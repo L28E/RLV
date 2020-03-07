@@ -16,7 +16,7 @@
 		}
 
 		img {
-			max-width: 90%;
+			max-width: 95%;
 			height: auto;
 			margin: 10px auto 20px;
 			display: block;
@@ -29,10 +29,23 @@
 		.param_column {
 			display: inline-block;
 			margin: auto;
+			text-align: center;
 		}
 
 		select {
-			border-radius: 7%;			
+			border-radius: 3%;
+			width: 100%;
+			border-color: white;
+			background-color: white;
+			font-style: italic;
+		}
+
+		.big {
+			display: block;<img src="./test.jpg">
+			width: 100%;
+			height: 80px;			
+			margin: 10% 5%;
+			border-radius: 3%;
 			border-color: white;
 			background-color: white;
 			font-style: italic;
@@ -43,7 +56,8 @@
 <body>
 	<header>
 		<h1>bleh</h1>
-		<img src="./stream.mjpg">
+		<img src="https://picsum.photos/1920/1080.jpg">
+		<!-- <img src="./stream.mjpg"> -->
 	</header>
 
 	<section>
@@ -55,35 +69,35 @@
 		<div class="param_column">
 			<p>ISO</p>
 			<select id="iso" onchange="changeISO()">
-				<option value="0">Auto</option>
-				<option value="1">100</option>
-				<option value="2">200</option>
-				<option value="3">400</option>
-				<option value="4">800</option>
-				<option value="5">1600</option>
+				<option value="auto">Auto</option>
+				<option value="100">100</option>
+				<option value="200">200</option>
+				<option value="400">400</option>
+				<option value="800">800</option>
+				<option value="1600">1600</option>
 			</select>
 		</div>
 
 		<div class="param_column">
 			<p>Aperture</p>
 			<select id="aperture" onchange="changeAperture()">
-				<option value="0">F3.5</option>
-				<option value="1">F4</option>
-				<option value="2">F4.5</option>
-				<option value="3">F5</option>
-				<option value="4">F5.6</option>
-				<option value="5">F6.3</option>
-				<option value="6">F7.1</option>
-				<option value="7">F8</option>
-				<option value="8">F9</option>
-				<option value="9">F10</option>
-				<option value="10">F11</option>
-				<option value="11">F13</option>
-				<option value="12">F14</option>
-				<option value="13">F16</option>
-				<option value="14">F18</option>
-				<option value="15">F20</option>
-				<option value="16">F22</option>
+				<option value="3.5">F3.5</option>
+				<option value="4">F4</option>
+				<option value="4.5">F4.5</option>
+				<option value="5">F5</option>
+				<option value="5.6">F5.6</option>
+				<option value="6.3">F6.3</option>
+				<option value="7.1">F7.1</option>
+				<option value="8">F8</option>
+				<option value="9">F9</option>
+				<option value="10">F10</option>
+				<option value="11">F11</option>
+				<option value="13">F13</option>
+				<option value="14">F14</option>
+				<option value="16">F16</option>
+				<option value="18">F18</option>
+				<option value="20">F20</option>
+				<option value="22">F22</option>
 			</select>
 
 		</div>
@@ -91,72 +105,81 @@
 		<div class="param_column">
 			<p>Shutter Speed</p>
 			<select id="shutter" onchange="changeShutter()">
-				<option value="0">bulb</option>
-				<option value="1">30</option>
-				<option value="2">25</option>
-				<option value="3">20</option>
-				<option value="4">15</option>
-				<option value="5">13</option>
-				<option value="6">10</option>
-				<option value="7">8</option>
-				<option value="8">6</option>
-				<option value="9">5</option>
-				<option value="10">4</option>
-				<option value="11">3.2</option>
-				<option value="12">2.5</option>
-				<option value="13">2</option>
-				<option value="14">1.6</option>
-				<option value="15">1.3</option>
-				<option value="16">1</option>
-				<option value="17">0.8</option>
-				<option value="18">0.6</option>
-				<option value="19">0.5</option>
-				<option value="20">0.4</option>
-				<option value="21">0.3</option>
-				<option value="22">1/4</option>
-				<option value="23">1/5</option>
-				<option value="24">1/6</option>
-				<option value="25">1/8</option>
-				<option value="26">1/10</option>
-				<option value="27">1/13</option>
-				<option value="28">1/15</option>
-				<option value="29">1/20</option>
-				<option value="30">1/25</option>
-				<option value="31">1/30</option>
-				<option value="32">1/40</option>
-				<option value="33">1/50</option>
-				<option value="34">1/60</option>
-				<option value="35">1/80</option>
-				<option value="36">1/100</option>
-				<option value="37">1/125</option>
-				<option value="38">1/160</option>
-				<option value="39">1/200</option>
-				<option value="40">1/250</option>
-				<option value="41">1/320</option>
-				<option value="42">1/400</option>
-				<option value="43">1/500</option>
-				<option value="44">1/640</option>
-				<option value="45">1/800</option>
-				<option value="46">1/1000</option>
-				<option value="47">1/1250</option>
-				<option value="48">1/1600</option>
-				<option value="49">1/2000</option>
-				<option value="50">1/2500</option>
-				<option value="51">1/3200</option>
-				<option value="52">1/4000</option>
+				<option value="bulb">Bulb</option>
+				<option value="30">30</option>
+				<option value="25">25</option>
+				<option value="20">20</option>
+				<option value="15">15</option>
+				<option value="13">13</option>
+				<option value="10">10</option>
+				<option value="8">8</option>
+				<option value="6">6</option>
+				<option value="5">5</option>
+				<option value="4">4</option>
+				<option value="3.2">3.2</option>
+				<option value="2.5">2.5</option>
+				<option value="2">2</option>
+				<option value="1.6">1.6</option>
+				<option value="1.3">1.3</option>
+				<option value="1">1</option>
+				<option value="0.8">0.8</option>
+				<option value="0.6">0.6</option>
+				<option value="0.5">0.5</option>
+				<option value="0.4">0.4</option>
+				<option value="0.3">0.3</option>
+				<option value="1/4">1/4</option>
+				<option value="1/5">1/5</option>
+				<option value="1/6">1/6</option>
+				<option value="1/8">1/8</option>
+				<option value="1/10">1/10</option>
+				<option value="1/13">1/13</option>
+				<option value="1/15">1/15</option>
+				<option value="1/20">1/20</option>
+				<option value="1/25">1/25</option>
+				<option value="1/30">1/30</option>
+				<option value="1/40">1/40</option>
+				<option value="1/50">1/50</option>
+				<option value="1/60">1/60</option>
+				<option value="1/80">1/80</option>
+				<option value="1/100">1/100</option>
+				<option value="1/125">1/125</option>
+				<option value="1/160">1/160</option>
+				<option value="1/200">1/200</option>
+				<option value="1/250">1/250</option>
+				<option value="1/320">1/320</option>
+				<option value="1/400">1/400</option>
+				<option value="1/500">1/500</option>
+				<option value="1/640">1/640</option>
+				<option value="1/800">1/800</option>
+				<option value="1/1000">1/1000</option>
+				<option value="1/1250">1/1250</option>
+				<option value="1/1600">1/1600</option>
+				<option value="1/2000">1/2000</option>
+				<option value="1/2500">1/2500</option>
+				<option value="1/3200">1/3200</option>
+				<option value="1/4000">1/4000</option>
 			</select>
 		</div>
 
 		<div class="param_column">
-			<button>snap</button>
+			<p>Drive Mode</p>
+			<select id="drive" onchange="changeDrive()">
+				<option value="Single">Single</option>
+				<option value="Timer 2 sec">Timer 2 sec</option>
+				<option value="Timer 10 sec">Timer 10 sec</option>
+			</select>
 		</div>
+	</section>
+
+	<section>
+		<button class="big">snap</button>
 	</section>
 
 	<script>
 		var iso;
 		var aperture;
 		var shutter;
-
+		var drive;
 
 		function changeISO() {
 			var temp = document.getElementById("iso").value;
@@ -170,11 +193,36 @@
 		}
 
 		function changeAperture() {
-			console.log(document.getElementById("aperture").value);
+			var temp = document.getElementById("aperture").value;
+			if (temp != aperture) {
+				aperture = temp;
+				const req = new XMLHttpRequest();
+				req.open("POST", ".");
+				req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				req.send("aperture=" + aperture);
+			}
 		}
 
 		function changeShutter() {
-			console.log(document.getElementById("shutter").value);
+			var temp = document.getElementById("shutter").value;
+			if (temp != shutter) {
+				shutter = temp;
+				const req = new XMLHttpRequest();
+				req.open("POST", ".");
+				req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				req.send("shutter=" + shutter);
+			}
+		}
+
+		function changeDrive() {
+			var temp = document.getElementById("drive").value;
+			if (temp != drive) {
+				drive = temp;
+				const req = new XMLHttpRequest();
+				req.open("POST", ".");
+				req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				req.send("drivemode=" + drive);
+			}
 		}
 	</script>
 </body>
