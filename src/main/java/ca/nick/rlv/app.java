@@ -84,13 +84,14 @@ public class app {
 			final OutputStream out = resp.getOutputStream();
 			CameraFile fileRef = camera.createCameraFile();
 			byte[] frame;
+			boolean loop = true;
 
 			// Multipart response allows frames to be replaced in subsequent messages
 			resp.setContentType("multipart/x-mixed-replace; boundary=--boundary");
 			resp.setStatus(HttpServletResponse.SC_OK);
 
 			// Send messages with image data in a while loop.
-			while (true) {
+			while (loop) {
 				try {
 					frame = camera.capturePreview(fileRef);
 
@@ -109,7 +110,7 @@ public class app {
 					 * If the response is interrupted, or if the image data cannot be read, 
 					 * exit loop and finish doGet
 					 */
-					break;
+					loop = false;
 				}
 			}
 		}
