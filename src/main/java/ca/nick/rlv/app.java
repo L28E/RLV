@@ -2,6 +2,7 @@ package ca.nick.rlv;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,7 +47,7 @@ public class app {
 		ServletContextHandler context = new ServletContextHandler();
 		context.setContextPath("/");
 		context.addServlet(StreamMJPG.class, "/stream.mjpg");
-		context.addServlet(cameraControl.class, "/");		
+		context.addServlet(cameraControl.class, "/");
 
 		// Register handlers with the server
 		handlers.setHandlers(new Handler[] { resourceHandler, context, new DefaultHandler() });
@@ -63,16 +64,31 @@ public class app {
 			}
 		});
 	}
-	
+
 	@SuppressWarnings("serial")
 	public static class cameraControl extends HttpServlet {
-    	
-    	@Override
-    	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    		System.out.println(req.getParameter("iso"));    		
-			resp.setStatus(HttpServletResponse.SC_OK);    		
-    	}
-    }	
+
+		@Override
+		protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+			switch (req.getParameterNames().nextElement()) {
+				case "iso":					
+					camera.setConfig("iso", req.getParameter("iso"));
+					break;
+				case "aperture":
+					camera.setConfig("aperture", req.getParameter("aperture"));
+					break;
+				case "shutter":
+					camera.setConfig("shutterspeed", req.getParameter("shutter"));
+					break;
+				case "drivemode":
+					camera.setConfig("drivemode", req.getParameter("drivemode"));
+					break;
+			}
+
+			resp.setStatus(HttpServletResponse.SC_OK);
+		}
+	}
 
 	@SuppressWarnings("serial")
 	public static class StreamMJPG extends HttpServlet {
@@ -101,15 +117,14 @@ public class app {
 					out.write(frame);
 					out.write(SEPARATOR);
 					out.flush();
-
-					// TODO: I dont like this, try de/un-reffing stuff here and in the api.
+					
+					//TODO: Properly limit frame rate
+					Thread.sleep(50);
+					
+					// TODO: I dont like this, try de/un-reffing stuff here and in the api.					
 					Thread.yield();
 					System.gc();
-				} catch (IOException ex) {
-					/*
-					 * If the response is interrupted, or if the image data cannot be read, 
-					 * exit loop and finish doGet
-					 */
+				} catch (IOException | InterruptedException ex) {
 					loop = false;
 				}
 			}
