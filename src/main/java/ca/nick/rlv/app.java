@@ -73,21 +73,21 @@ public class app {
 		protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 			switch (req.getParameterNames().nextElement()) {
-				case "iso":					
-					camera.setConfig("iso", req.getParameter("iso"));
-					break;
-				case "aperture":
-					camera.setConfig("aperture", req.getParameter("aperture"));
-					break;
-				case "shutter":
-					camera.setConfig("shutterspeed", req.getParameter("shutter"));
-					break;
-				case "drivemode":
-					camera.setConfig("drivemode", req.getParameter("drivemode"));
-					break;
-				case "snap":
-					camera.capture();
-					break;
+			case "iso":
+				camera.setConfig("iso", req.getParameter("iso"));
+				break;
+			case "aperture":
+				camera.setConfig("aperture", req.getParameter("aperture"));
+				break;
+			case "shutter":
+				camera.setConfig("shutterspeed", req.getParameter("shutter"));
+				break;
+			case "drivemode":
+				camera.setConfig("drivemode", req.getParameter("drivemode"));
+				break;
+			case "snap":
+				camera.capture();
+				break;
 			}
 			resp.setStatus(HttpServletResponse.SC_OK);
 		}
@@ -97,6 +97,7 @@ public class app {
 	public static class StreamMJPG extends HttpServlet {
 		private static final byte[] PREFIX = ("--boundary\r\nContent-type: image/jpg\r\nContent-Length: ").getBytes();
 		private static final byte[] SEPARATOR = "\r\n\r\n".getBytes();
+		private static final long FRAME_INTERVAL = 33;
 
 		@Override
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -104,35 +105,32 @@ public class app {
 			CameraFile fileRef = camera.createCameraFile();
 			byte[] frame;
 			boolean loop = true;
+			long prevFrame = 0;
 
 			// Multipart response allows frames to be replaced in subsequent messages
 			resp.setContentType("multipart/x-mixed-replace; boundary=--boundary");
 			resp.setStatus(HttpServletResponse.SC_OK);
 
 			// Send messages with image data in a while loop.
-			while (loop) {
-				
-				//get the system time and wait for the specfied interval
-				
-				
-				try {
-					frame = camera.capturePreview(fileRef);
+			while (loop) {				
+				if (System.currentTimeMillis() - prevFrame > FRAME_INTERVAL) {
 
-					out.write(PREFIX);
-					out.write(String.valueOf(frame.length).getBytes());
-					out.write(SEPARATOR);
-					out.write(frame);
-					out.write(SEPARATOR);
-					out.flush();
-					
-					//TODO: Properly limit frame rate
-					Thread.sleep(50);
-					
-					// TODO: I dont like this, try de/un-reffing stuff here and in the api.					
-					Thread.yield();
-					System.gc();
-				} catch (IOException | InterruptedException ex) {
-					loop = false;
+					prevFrame = System.currentTimeMillis();
+					try {
+						frame = camera.capturePreview(fileRef);
+
+						out.write(PREFIX);
+						out.write(String.valueOf(frame.length).getBytes());
+						out.write(SEPARATOR);
+						out.write(frame);
+						out.write(SEPARATOR);
+						out.flush();
+						
+						Thread.yield();
+						System.gc();
+					} catch (IOException ex) {
+						loop = false;
+					}
 				}
 			}
 		}
