@@ -19,6 +19,7 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
 import com.angryelectron.gphoto2.GPhoto2;
+import com.angryelectron.libgphoto2.Gphoto2Library.CameraEventType;
 import com.angryelectron.libgphoto2.Gphoto2Library.CameraFile;
 
 public class app {
@@ -84,8 +85,10 @@ public class app {
 				case "drivemode":
 					camera.setConfig("drivemode", req.getParameter("drivemode"));
 					break;
+				case "snap":
+					camera.capture();
+					break;
 			}
-
 			resp.setStatus(HttpServletResponse.SC_OK);
 		}
 	}
@@ -108,6 +111,10 @@ public class app {
 
 			// Send messages with image data in a while loop.
 			while (loop) {
+				
+				//get the system time and wait for the specfied interval
+				
+				
 				try {
 					frame = camera.capturePreview(fileRef);
 
