@@ -3,6 +3,7 @@ package ca.nick.rlv;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,11 +20,14 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 
 import com.angryelectron.gphoto2.GPhoto2;
+import com.angryelectron.gphoto2.GPhoto2Config;
 import com.angryelectron.libgphoto2.Gphoto2Library.CameraEventType;
 import com.angryelectron.libgphoto2.Gphoto2Library.CameraFile;
+import com.angryelectron.libgphoto2.Gphoto2Library.CameraWidget;
 
 public class app {
 	private static GPhoto2 camera = new GPhoto2();
+	private static GPhoto2Config config;
 
 	public static void main(String[] args) throws Exception {
 
@@ -35,8 +39,18 @@ public class app {
 			System.exit(-1);
 		}
 
-		Server server = new Server(8080);
-		HandlerList handlers = new HandlerList();
+		// Make sure the image destination is set to the SD card
+		config = new GPhoto2Config(camera);
+		config.readConfig();
+		if (!config.getParameter("capturetarget").equals("Memory card")) {
+			camera.setConfig(config, "capturetarget", "Memory card");
+		}
+
+		// TODO Get current camera params for webpage load
+		List<String> isoList = camera.getChoiceList(config.getParameterWidget("iso"));
+		List<String> fstopList = camera.getChoiceList(config.getParameterWidget("aperture"));
+		List<String> shutterList = camera.getChoiceList(config.getParameterWidget("shutterspeed"));
+		List<String> modeList = camera.getChoiceList(config.getParameterWidget("drivemode"));
 
 		// Resource handler
 		ResourceHandler resourceHandler = new ResourceHandler();
@@ -51,7 +65,9 @@ public class app {
 		context.addServlet(cameraControl.class, "/");
 
 		// Register handlers with the server
+		HandlerList handlers = new HandlerList();
 		handlers.setHandlers(new Handler[] { resourceHandler, context, new DefaultHandler() });
+		Server server = new Server(8080);
 		server.setHandler(handlers);
 
 		// Start server
@@ -71,19 +87,18 @@ public class app {
 
 		@Override
 		protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
 			switch (req.getParameterNames().nextElement()) {
 			case "iso":
-				camera.setConfig("iso", req.getParameter("iso"));
+				camera.setConfig(config, "iso", req.getParameter("iso"));
 				break;
 			case "aperture":
-				camera.setConfig("aperture", req.getParameter("aperture"));
+				camera.setConfig(config, "aperture", req.getParameter("aperture"));
 				break;
 			case "shutter":
-				camera.setConfig("shutterspeed", req.getParameter("shutter"));
+				camera.setConfig(config, "shutterspeed", req.getParameter("shutter"));
 				break;
 			case "drivemode":
-				camera.setConfig("drivemode", req.getParameter("drivemode"));
+				camera.setConfig(config, "drivemode", req.getParameter("drivemode"));
 				break;
 			case "snap":
 				camera.capture();
@@ -112,7 +127,7 @@ public class app {
 			resp.setStatus(HttpServletResponse.SC_OK);
 
 			// Send messages with image data in a while loop.
-			while (loop) {				
+			while (loop) {
 				if (System.currentTimeMillis() - prevFrame > FRAME_INTERVAL) {
 
 					prevFrame = System.currentTimeMillis();
@@ -125,7 +140,8 @@ public class app {
 						out.write(frame);
 						out.write(SEPARATOR);
 						out.flush();
-						
+
+						frame = null;
 						Thread.yield();
 						System.gc();
 					} catch (IOException ex) {
