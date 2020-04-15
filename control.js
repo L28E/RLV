@@ -11,7 +11,10 @@ window.onload = function getParamTest() {
 
     req.onload = function () {
         var params = req.response;
-        console.log(params);
+               
+        for(var i = 0; i < params.length; i++){
+            $('#iso').append($("<option>").text(params[i]).val(params[i]));
+        }      
     }
 }
 
