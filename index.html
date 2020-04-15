@@ -180,6 +180,19 @@
 		var shutter;
 		var drive;
 
+		window.onload = function getParamTest(){
+			const req = new XMLHttpRequest();
+			req.open("GET", "./test");
+			req.responseType = 'json';
+			req.send();
+			
+			req.onload = function() {
+				var params = req.response;
+			  	console.log(params);
+			}					
+		}
+		
+		
 		function changeISO() {
 			var temp = document.getElementById("iso").value;
 			if (temp != iso) {

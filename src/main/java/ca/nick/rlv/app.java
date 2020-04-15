@@ -2,7 +2,7 @@ package ca.nick.rlv;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Enumeration;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,13 +21,14 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 
 import com.angryelectron.gphoto2.GPhoto2;
 import com.angryelectron.gphoto2.GPhoto2Config;
-import com.angryelectron.libgphoto2.Gphoto2Library.CameraEventType;
 import com.angryelectron.libgphoto2.Gphoto2Library.CameraFile;
-import com.angryelectron.libgphoto2.Gphoto2Library.CameraWidget;
+import com.google.gson.Gson;
 
 public class app {
 	private static GPhoto2 camera = new GPhoto2();
 	private static GPhoto2Config config;
+	
+	static List<String> isoList;
 
 	public static void main(String[] args) throws Exception {
 
@@ -47,11 +48,11 @@ public class app {
 		}
 
 		// TODO Get current camera params for webpage load
-		List<String> isoList = camera.getChoiceList(config.getParameterWidget("iso"));
+		isoList = camera.getChoiceList(config.getParameterWidget("iso"));
 		List<String> fstopList = camera.getChoiceList(config.getParameterWidget("aperture"));
 		List<String> shutterList = camera.getChoiceList(config.getParameterWidget("shutterspeed"));
 		List<String> modeList = camera.getChoiceList(config.getParameterWidget("drivemode"));
-
+		
 		// Resource handler
 		ResourceHandler resourceHandler = new ResourceHandler();
 		resourceHandler.setDirectoriesListed(true);
@@ -63,6 +64,7 @@ public class app {
 		context.setContextPath("/");
 		context.addServlet(StreamMJPG.class, "/stream.mjpg");
 		context.addServlet(cameraControl.class, "/");
+		context.addServlet(GetParams.class, "/test");
 
 		// Register handlers with the server
 		HandlerList handlers = new HandlerList();
@@ -84,7 +86,7 @@ public class app {
 
 	@SuppressWarnings("serial")
 	public static class cameraControl extends HttpServlet {
-
+		
 		@Override
 		protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 			switch (req.getParameterNames().nextElement()) {
@@ -150,5 +152,21 @@ public class app {
 				}
 			}
 		}
+	}	
+	
+	@SuppressWarnings("serial")
+	public static class GetParams extends HttpServlet {
+
+		@Override
+		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+			PrintWriter out = resp.getWriter();
+			
+			String json = new Gson().toJson(isoList);
+			out.print(json);	
+			
+			resp.setContentType("application/json");
+			resp.setStatus(HttpServletResponse.SC_OK);
+		}
+		
 	}
 }
