@@ -1,56 +1,11 @@
 <html>
 
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" charset="utf-8">
 	<title>Nick's Remote Viewfinder</title>
-	<style>
-		body {
-			background: rgb(58, 58, 58);
-			color: white;
-			font-family: Arial, Helvetica, sans-serif;
-			font-style: italic;
-		}
-
-		h1 {
-			text-align: center;
-		}
-
-		img {
-			max-width: 95%;
-			height: auto;
-			margin: 10px auto 20px;
-			display: block;
-		}
-
-		section {
-			display: flex;
-		}
-
-		.param_column {
-			display: inline-block;
-			margin: auto;
-			text-align: center;
-		}
-
-		select {
-			border-radius: 3%;
-			width: 100%;
-			border-color: white;
-			background-color: white;
-			font-style: italic;
-		}
-
-		.big {
-			display: block;
-			width: 100%;
-			height: 80px;			
-			margin: 10% 5%;
-			border-radius: 3%;
-			border-color: white;
-			background-color: white;
-			font-style: italic;
-		}
-	</style>
+	<script src="jquery-3.5.0.js"></script>
+	<script src="control.js"></script>
+	<link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -174,74 +129,4 @@
 		<button class="big" onclick="snap()">snap</button>
 	</section>
 
-	<script>
-		var iso;
-		var aperture;
-		var shutter;
-		var drive;
-
-		window.onload = function getParamTest(){
-			const req = new XMLHttpRequest();
-			req.open("GET", "./test");
-			req.responseType = 'json';
-			req.send();
-			
-			req.onload = function() {
-				var params = req.response;
-			  	console.log(params);
-			}					
-		}
-		
-		
-		function changeISO() {
-			var temp = document.getElementById("iso").value;
-			if (temp != iso) {
-				iso = temp;
-				const req = new XMLHttpRequest();
-				req.open("POST", ".");
-				req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				req.send("iso=" + iso);
-			}
-		}
-
-		function changeAperture() {
-			var temp = document.getElementById("aperture").value;
-			if (temp != aperture) {
-				aperture = temp;
-				const req = new XMLHttpRequest();
-				req.open("POST", ".");
-				req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				req.send("aperture=" + aperture);
-			}
-		}
-
-		function changeShutter() {
-			var temp = document.getElementById("shutter").value;
-			if (temp != shutter) {
-				shutter = temp;
-				const req = new XMLHttpRequest();
-				req.open("POST", ".");
-				req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				req.send("shutter=" + shutter);
-			}
-		}
-
-		function changeDrive() {
-			var temp = document.getElementById("drive").value;
-			if (temp != drive) {
-				drive = temp;
-				const req = new XMLHttpRequest();
-				req.open("POST", ".");
-				req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				req.send("drivemode=" + drive);
-			}
-		}
-
-		function snap(){
-			const req = new XMLHttpRequest();
-			req.open("POST", ".");
-			req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-			req.send("snap=");
-		}
-	</script>
 </body>

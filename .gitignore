@@ -6,3 +6,6 @@
 #Build stuff
 target
 *.log
+
+#Misc
+jquery-3.5.0.js

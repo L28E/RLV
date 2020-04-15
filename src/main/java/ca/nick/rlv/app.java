@@ -166,7 +166,6 @@ public class app {
 			
 			resp.setContentType("application/json");
 			resp.setStatus(HttpServletResponse.SC_OK);
-		}
-		
+		}		
 	}
 }
