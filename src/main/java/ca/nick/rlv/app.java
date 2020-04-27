@@ -2,7 +2,6 @@ package ca.nick.rlv;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,17 +17,21 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import com.angryelectron.gphoto2.GPhoto2;
 import com.angryelectron.gphoto2.GPhoto2Config;
 import com.angryelectron.libgphoto2.Gphoto2Library.CameraFile;
-import com.google.gson.Gson;
 
 public class app {
 	private static GPhoto2 camera = new GPhoto2();
 	private static GPhoto2Config config;
-	
+
 	static List<String> isoList;
+	static List<String> fstopList;
+	static List<String> shutterList;
+	static List<String> modeList;
 
 	public static void main(String[] args) throws Exception {
 
@@ -47,12 +50,12 @@ public class app {
 			camera.setConfig(config, "capturetarget", "Memory card");
 		}
 
-		// TODO Get current camera params for webpage load
+		// Get current camera params for webpage load
 		isoList = camera.getChoiceList(config.getParameterWidget("iso"));
-		List<String> fstopList = camera.getChoiceList(config.getParameterWidget("aperture"));
-		List<String> shutterList = camera.getChoiceList(config.getParameterWidget("shutterspeed"));
-		List<String> modeList = camera.getChoiceList(config.getParameterWidget("drivemode"));
-		
+		fstopList = camera.getChoiceList(config.getParameterWidget("aperture"));
+		shutterList = camera.getChoiceList(config.getParameterWidget("shutterspeed"));
+		modeList = camera.getChoiceList(config.getParameterWidget("drivemode"));
+
 		// Resource handler
 		ResourceHandler resourceHandler = new ResourceHandler();
 		resourceHandler.setDirectoriesListed(true);
@@ -63,8 +66,8 @@ public class app {
 		ServletContextHandler context = new ServletContextHandler();
 		context.setContextPath("/");
 		context.addServlet(StreamMJPG.class, "/stream.mjpg");
-		context.addServlet(cameraControl.class, "/");
-		context.addServlet(GetParams.class, "/test");
+		context.addServlet(CameraControlServlet.class, "/cameraControl");
+		context.addServlet(GetSettingsServlet.class, "/getSettings");
 
 		// Register handlers with the server
 		HandlerList handlers = new HandlerList();
@@ -85,8 +88,8 @@ public class app {
 	}
 
 	@SuppressWarnings("serial")
-	public static class cameraControl extends HttpServlet {
-		
+	public static class CameraControlServlet extends HttpServlet {
+
 		@Override
 		protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 			switch (req.getParameterNames().nextElement()) {
@@ -118,11 +121,11 @@ public class app {
 
 		@Override
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-			final OutputStream out = resp.getOutputStream();
-			CameraFile fileRef = camera.createCameraFile();
-			byte[] frame;
 			boolean loop = true;
+			byte[] frame;
 			long prevFrame = 0;
+			CameraFile fileRef = camera.createCameraFile();			
+			final OutputStream out = resp.getOutputStream();			
 
 			// Multipart response allows frames to be replaced in subsequent messages
 			resp.setContentType("multipart/x-mixed-replace; boundary=--boundary");
@@ -152,20 +155,22 @@ public class app {
 				}
 			}
 		}
-	}	
-	
+	}
+
 	@SuppressWarnings("serial")
-	public static class GetParams extends HttpServlet {
+	public static class GetSettingsServlet extends HttpServlet {
 
 		@Override
 		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-			PrintWriter out = resp.getWriter();
-			
-			String json = new Gson().toJson(isoList);
-			out.print(json);	
-			
+			JSONObject object = new JSONObject();
+			object.put("iso", new JSONArray(isoList))
+				  .put("fstop", new JSONArray(fstopList))
+				  .put("shutter", new JSONArray(shutterList))
+				  .put("mode", new JSONArray(modeList));			
+
+			resp.getWriter().print(object.toString());
 			resp.setContentType("application/json");
 			resp.setStatus(HttpServletResponse.SC_OK);
-		}		
+		}
 	}
 }
