@@ -12,14 +12,14 @@ import com.angryelectron.gphoto2.GPhoto2;
 import com.angryelectron.libgphoto2.Gphoto2Library.CameraFile;
 
 @SuppressWarnings("serial")
-public class StreamMJPG extends HttpServlet {	
-	
-	private GPhoto2 camera;	
-	
+public class StreamMJPG extends HttpServlet {
+
+	private GPhoto2 camera;
+
 	private static final byte[] PREFIX = ("--boundary\r\nContent-type: image/jpg\r\nContent-Length: ").getBytes();
 	private static final byte[] SEPARATOR = "\r\n\r\n".getBytes();
 	private static final long FRAME_INTERVAL = 33;
-	
+
 	public StreamMJPG() {
 		this.camera = app.camera;
 	}
@@ -29,17 +29,17 @@ public class StreamMJPG extends HttpServlet {
 		boolean loop = true;
 		byte[] frame;
 		long prevFrame = 0;
-		CameraFile fileRef = camera.createCameraFile();			
-		final OutputStream out = resp.getOutputStream();			
+		CameraFile fileRef = camera.createCameraFile();
+		final OutputStream out = resp.getOutputStream();
 
-		// Multipart response allows frames to be replaced in subsequent messages
+		/*
+		 * Multipart response allows frames to be replaced in subsequent messages. Send
+		 * messages with image data in a while loop.
+		 */
 		resp.setContentType("multipart/x-mixed-replace; boundary=--boundary");
 		resp.setStatus(HttpServletResponse.SC_OK);
-
-		// Send messages with image data in a while loop.
 		while (loop) {
 			if (System.currentTimeMillis() - prevFrame > FRAME_INTERVAL) {
-
 				prevFrame = System.currentTimeMillis();
 				try {
 					frame = camera.capturePreview(fileRef);
@@ -50,13 +50,13 @@ public class StreamMJPG extends HttpServlet {
 					out.write(frame);
 					out.write(SEPARATOR);
 					out.flush();
-
-					frame = null;
-					Thread.yield();
-					System.gc();
 				} catch (IOException ex) {
 					loop = false;
 				}
+
+				frame = null;
+				Thread.yield();
+				System.gc();
 			}
 		}
 	}

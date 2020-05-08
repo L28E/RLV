@@ -33,13 +33,7 @@ public class app {
 		config.readConfig();
 		if (!config.getParameter("capturetarget").equals("Memory card")) {
 			camera.setConfig(config, "capturetarget", "Memory card");
-		}
-
-		//TODO: Get current values
-		String startIso = config.getParameterValue(config.getParameterWidget("iso"));
-		String startFstop = config.getParameterValue(config.getParameterWidget("aperture"));
-		String startShutter = config.getParameterValue(config.getParameterWidget("shutterspeed"));
-		String startMode = config.getParameterValue(config.getParameterWidget("drivemode"));		
+		}			
 		
 		// Resource handler
 		ResourceHandler resourceHandler = new ResourceHandler();

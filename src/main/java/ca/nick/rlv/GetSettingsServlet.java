@@ -16,15 +16,10 @@ import com.angryelectron.gphoto2.GPhoto2Config;
 
 @SuppressWarnings("serial")
 public class GetSettingsServlet extends HttpServlet {
-	
+
 	private GPhoto2 camera;
-	private GPhoto2Config config;	
-	
-	static List<String> isoList;
-	static List<String> fstopList;
-	static List<String> shutterList;
-	static List<String> modeList;
-	
+	private GPhoto2Config config;
+
 	public GetSettingsServlet() {
 		this.camera = app.camera;
 		this.config = app.config;
@@ -32,19 +27,35 @@ public class GetSettingsServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		
+
 		// Get a list of values for each parameter
-		isoList = camera.getChoiceList(config.getParameterWidget("iso"));
-		fstopList = camera.getChoiceList(config.getParameterWidget("aperture"));
-		shutterList = camera.getChoiceList(config.getParameterWidget("shutterspeed"));
-		modeList = camera.getChoiceList(config.getParameterWidget("drivemode"));
+		List<String> isoList = camera.getChoiceList(config.getParameterWidget("iso"));
+		List<String> fstopList = camera.getChoiceList(config.getParameterWidget("aperture"));
+		List<String> shutterList = camera.getChoiceList(config.getParameterWidget("shutterspeed"));
+		List<String> modeList = camera.getChoiceList(config.getParameterWidget("drivemode"));
+
+		// Get current settings
+		String startIso = config.getParameterValue(config.getParameterWidget("iso"));
+		String startFstop = config.getParameterValue(config.getParameterWidget("aperture"));
+		String startShutter = config.getParameterValue(config.getParameterWidget("shutterspeed"));
+		String startMode = config.getParameterValue(config.getParameterWidget("drivemode"));
+
+		// Build and send a JSON		
+		JSONObject object = new JSONObject();		
 		
-		// Build and send a JSON
-		JSONObject object = new JSONObject();
-		object.put("iso", new JSONArray(isoList))
-			  .put("fstop", new JSONArray(fstopList))
-			  .put("shutter", new JSONArray(shutterList))
-			  .put("mode", new JSONArray(modeList));			
+		JSONObject settingsList = new JSONObject();
+		settingsList.put("iso", new JSONArray(isoList))
+					.put("fstop", new JSONArray(fstopList))
+					.put("shutter", new JSONArray(shutterList))
+					.put("mode", new JSONArray(modeList));
+
+		JSONObject currentSettings = new JSONObject();
+		currentSettings.put("iso", startIso)
+					   .put("fstop", startFstop)
+					   .put("shutter", startShutter)
+					   .put("mode", startMode);
+		
+		object.put("settingsList", settingsList).put("currentSettings", currentSettings);
 
 		resp.getWriter().print(object.toString());
 		resp.setContentType("application/json");

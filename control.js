@@ -13,21 +13,27 @@ window.onload = function getParams() {
         var params = req.response;
 
         // Populate each select               
-        for(var i = 0; i < params.iso.length; i++){
-            $('#iso').append($("<option>").text(params.iso[i]).val(params.iso[i]));
-        } 
-        
-        for(var i = 0; i < params.fstop.length; i++){
-            $('#fstop').append($("<option>").text(params.fstop[i]).val(params.fstop[i]));
-        }  
+        for (var i = 0; i < params.settingsList.iso.length; i++) {
+            $('#iso').append($("<option>").text(params.settingsList.iso[i]).val(params.settingsList.iso[i]));
+        }
 
-        for(var i = 0; i < params.shutter.length; i++){
-            $('#shutter').append($("<option>").text(params.shutter[i]).val(params.shutter[i]));
-        }  
+        for (var i = 0; i < params.settingsList.fstop.length; i++) {
+            $('#fstop').append($("<option>").text(params.settingsList.fstop[i]).val(params.settingsList.fstop[i]));
+        }
 
-        for(var i = 0; i < params.mode.length; i++){
-            $('#mode').append($("<option>").text(params.mode[i]).val(params.mode[i]));
-        }  
+        for (var i = 0; i < params.settingsList.shutter.length; i++) {
+            $('#shutter').append($("<option>").text(params.settingsList.shutter[i]).val(params.settingsList.shutter[i]));
+        }
+
+        for (var i = 0; i < params.settingsList.mode.length; i++) {
+            $('#mode').append($("<option>").text(params.settingsList.mode[i]).val(params.settingsList.mode[i]));
+        }
+
+        // Set each select to the current value
+        $('#iso').val(params.currentSettings.iso);
+        $('#fstop').val(params.currentSettings.fstop);
+        $('#shutter').val(params.currentSettings.shutter);
+        $('#mode').val(params.currentSettings.mode);
     }
 }
 
