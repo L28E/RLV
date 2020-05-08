@@ -1,15 +1,8 @@
 package ca.nick.rlv;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -17,21 +10,13 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import com.angryelectron.gphoto2.GPhoto2;
 import com.angryelectron.gphoto2.GPhoto2Config;
-import com.angryelectron.libgphoto2.Gphoto2Library.CameraFile;
 
 public class app {
-	private static GPhoto2 camera = new GPhoto2();
-	private static GPhoto2Config config;
-
-	static List<String> isoList;
-	static List<String> fstopList;
-	static List<String> shutterList;
-	static List<String> modeList;
+	static GPhoto2 camera = new GPhoto2();
+	static GPhoto2Config config;
 
 	public static void main(String[] args) throws Exception {
 
@@ -50,12 +35,12 @@ public class app {
 			camera.setConfig(config, "capturetarget", "Memory card");
 		}
 
-		// Get current camera params for webpage load
-		isoList = camera.getChoiceList(config.getParameterWidget("iso"));
-		fstopList = camera.getChoiceList(config.getParameterWidget("aperture"));
-		shutterList = camera.getChoiceList(config.getParameterWidget("shutterspeed"));
-		modeList = camera.getChoiceList(config.getParameterWidget("drivemode"));
-
+		//TODO: Get current values
+		String startIso = config.getParameterValue(config.getParameterWidget("iso"));
+		String startFstop = config.getParameterValue(config.getParameterWidget("aperture"));
+		String startShutter = config.getParameterValue(config.getParameterWidget("shutterspeed"));
+		String startMode = config.getParameterValue(config.getParameterWidget("drivemode"));		
+		
 		// Resource handler
 		ResourceHandler resourceHandler = new ResourceHandler();
 		resourceHandler.setDirectoriesListed(true);
@@ -67,7 +52,7 @@ public class app {
 		context.setContextPath("/");
 		context.addServlet(StreamMJPG.class, "/stream.mjpg");
 		context.addServlet(CameraControlServlet.class, "/cameraControl");
-		context.addServlet(GetSettingsServlet.class, "/getSettings");
+		context.addServlet(GetSettingsServlet.class, "/getValues");
 
 		// Register handlers with the server
 		HandlerList handlers = new HandlerList();
@@ -85,92 +70,5 @@ public class app {
 				camera.close();
 			}
 		});
-	}
-
-	@SuppressWarnings("serial")
-	public static class CameraControlServlet extends HttpServlet {
-
-		@Override
-		protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-			switch (req.getParameterNames().nextElement()) {
-			case "iso":
-				camera.setConfig(config, "iso", req.getParameter("iso"));
-				break;
-			case "aperture":
-				camera.setConfig(config, "aperture", req.getParameter("aperture"));
-				break;
-			case "shutter":
-				camera.setConfig(config, "shutterspeed", req.getParameter("shutter"));
-				break;
-			case "drivemode":
-				camera.setConfig(config, "drivemode", req.getParameter("drivemode"));
-				break;
-			case "snap":
-				camera.capture();
-				break;
-			}
-			resp.setStatus(HttpServletResponse.SC_OK);
-		}
-	}
-
-	@SuppressWarnings("serial")
-	public static class StreamMJPG extends HttpServlet {
-		private static final byte[] PREFIX = ("--boundary\r\nContent-type: image/jpg\r\nContent-Length: ").getBytes();
-		private static final byte[] SEPARATOR = "\r\n\r\n".getBytes();
-		private static final long FRAME_INTERVAL = 33;
-
-		@Override
-		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-			boolean loop = true;
-			byte[] frame;
-			long prevFrame = 0;
-			CameraFile fileRef = camera.createCameraFile();			
-			final OutputStream out = resp.getOutputStream();			
-
-			// Multipart response allows frames to be replaced in subsequent messages
-			resp.setContentType("multipart/x-mixed-replace; boundary=--boundary");
-			resp.setStatus(HttpServletResponse.SC_OK);
-
-			// Send messages with image data in a while loop.
-			while (loop) {
-				if (System.currentTimeMillis() - prevFrame > FRAME_INTERVAL) {
-
-					prevFrame = System.currentTimeMillis();
-					try {
-						frame = camera.capturePreview(fileRef);
-
-						out.write(PREFIX);
-						out.write(String.valueOf(frame.length).getBytes());
-						out.write(SEPARATOR);
-						out.write(frame);
-						out.write(SEPARATOR);
-						out.flush();
-
-						frame = null;
-						Thread.yield();
-						System.gc();
-					} catch (IOException ex) {
-						loop = false;
-					}
-				}
-			}
-		}
-	}
-
-	@SuppressWarnings("serial")
-	public static class GetSettingsServlet extends HttpServlet {
-
-		@Override
-		protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-			JSONObject object = new JSONObject();
-			object.put("iso", new JSONArray(isoList))
-				  .put("fstop", new JSONArray(fstopList))
-				  .put("shutter", new JSONArray(shutterList))
-				  .put("mode", new JSONArray(modeList));			
-
-			resp.getWriter().print(object.toString());
-			resp.setContentType("application/json");
-			resp.setStatus(HttpServletResponse.SC_OK);
-		}
 	}
 }

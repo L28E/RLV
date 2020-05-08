@@ -5,14 +5,12 @@ var drive;
 
 window.onload = function getParams() {
     const req = new XMLHttpRequest();
-    req.open("GET", "./getSettings");
+    req.open("GET", "./getValues");
     req.responseType = 'json';
     req.send();
 
     req.onload = function () {
         var params = req.response;
-
-        console.log(params.iso);
 
         // Populate each select               
         for(var i = 0; i < params.iso.length; i++){
