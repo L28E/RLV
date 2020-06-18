@@ -2,6 +2,8 @@ package ca.nick.rlv;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,14 +16,14 @@ import com.angryelectron.libgphoto2.Gphoto2Library.CameraFile;
 @SuppressWarnings("serial")
 public class StreamMJPG extends HttpServlet {
 
-	private GPhoto2 camera;
+	private final GPhoto2 camera;
 
 	private static final byte[] PREFIX = ("--boundary\r\nContent-type: image/jpg\r\nContent-Length: ").getBytes();
 	private static final byte[] SEPARATOR = "\r\n\r\n".getBytes();
 	private static final long FRAME_INTERVAL = 33;
 
 	public StreamMJPG() {
-		this.camera = app.camera;
+		this.camera = Main.camera;
 	}
 
 	@Override
@@ -29,8 +31,17 @@ public class StreamMJPG extends HttpServlet {
 		boolean loop = true;
 		byte[] frame;
 		long prevFrame = 0;
-		CameraFile fileRef = camera.createCameraFile();
-		final OutputStream out = resp.getOutputStream();
+		CameraFile fileRef;
+		final OutputStream out;
+
+		try {
+			fileRef = camera.createCameraFile();
+			out = resp.getOutputStream();
+		} catch (IOException ex) {
+			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			Logger.getLogger(StreamMJPG.class.getName()).log(Level.SEVERE, ex.getMessage());
+			return;
+		}
 
 		/*
 		 * Multipart response allows frames to be replaced in subsequent messages. Send
@@ -54,9 +65,7 @@ public class StreamMJPG extends HttpServlet {
 					loop = false;
 				}
 
-				frame = null;
 				Thread.yield();
-				System.gc();
 			}
 		}
 	}

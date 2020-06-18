@@ -14,7 +14,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import com.angryelectron.gphoto2.GPhoto2;
 import com.angryelectron.gphoto2.GPhoto2Config;
 
-public class app {
+public class Main {
 	static GPhoto2 camera = new GPhoto2();
 	static GPhoto2Config config;
 
@@ -24,7 +24,7 @@ public class app {
 		try {
 			camera.open();
 		} catch (IOException ex) {
-			Logger.getLogger(app.class.getName()).log(Level.SEVERE, ex.getMessage());
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, ex.getMessage());
 			System.exit(-1);
 		}
 
@@ -60,6 +60,7 @@ public class app {
 
 		// Close the camera connection when the program ends
 		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
 			public void run() {
 				camera.close();
 			}
