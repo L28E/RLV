@@ -1,0 +1,3 @@
+[submodule "libgphoto2-jna"]
+	path = libgphoto2-jna
+	url = https://github.com/L28E/libgphoto2-jna.git
