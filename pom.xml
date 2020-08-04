@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ca.nick</groupId>
-	<artifactId>rlv</artifactId>
+	<artifactId>remote-viewfinder</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>rlv</name>
+	<name>remote-viewfinder</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
