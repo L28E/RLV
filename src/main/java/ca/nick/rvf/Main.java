@@ -1,15 +1,15 @@
 package ca.nick.rvf;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.resource.Resource;
 
 import com.angryelectron.gphoto2.GPhoto2;
 import com.angryelectron.gphoto2.GPhoto2Config;
@@ -19,6 +19,16 @@ public class Main {
 	static GPhoto2Config config;
 
 	public static void main(String[] args) throws Exception {
+		{
+			try {
+				new Main().run();
+			} catch (Throwable t) {
+				t.printStackTrace();
+			}
+		}
+	}
+
+	public void run() throws Exception {
 
 		// Open a camera connection
 		try {
@@ -28,33 +38,34 @@ public class Main {
 			System.exit(-1);
 		}
 
+		// Get URI of static web content
+		URL resourceLocation = this.getClass().getResource("/index.html");
+		if (resourceLocation == null) {
+			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Could not find index.html");
+			System.exit(-1);
+		}
+		URI resourceUri = URI.create(resourceLocation.toURI().toASCIIString().replaceFirst("/index.html$", "/"));
+		
 		// Make sure the image destination is set to the SD card
 		config = new GPhoto2Config(camera);
 		config.readConfig();
 		if (!config.getParameter("capturetarget").equals("Memory card")) {
 			camera.setConfig(config, "capturetarget", "Memory card");
-		}			
-		
-		// Resource handler
-		ResourceHandler resourceHandler = new ResourceHandler();
-		resourceHandler.setDirectoriesListed(true);
-		resourceHandler.setResourceBase(".");
-		resourceHandler.setWelcomeFiles(new String[] { "index.html" });
+		}		
 
 		// Context handler
-		ServletContextHandler context = new ServletContextHandler();
-		context.setContextPath("/");
-		context.addServlet(StreamMJPG.class, "/stream.mjpg");
-		context.addServlet(CameraControlServlet.class, "/cameraControl");
-		context.addServlet(GetSettingsServlet.class, "/getValues");
-
-		// Register handlers with the server
-		HandlerList handlers = new HandlerList();
-		handlers.setHandlers(new Handler[] { resourceHandler, context, new DefaultHandler() });
-		Server server = new Server(8080);
-		server.setHandler(handlers);
+		ServletContextHandler contextHandler = new ServletContextHandler();
+		contextHandler.setContextPath("/");
+		contextHandler.setBaseResource(Resource.newResource(resourceUri));
+		contextHandler.setWelcomeFiles(new String[] { "index.html" });
+		contextHandler.addServlet(StreamMJPG.class, "/stream.mjpg");
+		contextHandler.addServlet(CameraControlServlet.class, "/cameraControl");
+		contextHandler.addServlet(GetSettingsServlet.class, "/getValues");
+		contextHandler.addServlet(DefaultServlet.class, "/");
 
 		// Start server
+		Server server = new Server(8080);
+		server.setHandler(contextHandler);
 		server.start();
 		server.join();
 
